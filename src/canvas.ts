@@ -1,6 +1,5 @@
 import {Application} from 'pixi.js';
 import Letra from './Letra'
-//import * as Console from "console";
 
 export default class Canvas {
   private app: Application;
@@ -39,7 +38,7 @@ export default class Canvas {
 
 
   public arregloDeLetras: string [] = [];
-
+  public arregloDeLetrasDisponibles: string []= new Array(7);
 
   constructor(
     width: number,
@@ -89,8 +88,27 @@ export default class Canvas {
 
 
 
+
+    //Llenar los espacios con la palabra vacio.
+    for(let i = 0; i<7; i++) {
+
+      let numerosDisponibles = (Math.random() * (this.arregloDeLetras.length - 0) + 0);
+
+      console.log("numeros: "+ Math.ceil(numerosDisponibles));
+
+      if(this.arregloDeLetrasDisponibles[i] === undefined) {
+        this.arregloDeLetrasDisponibles[i] = this.arregloDeLetras[Math.ceil(numerosDisponibles)];
+        this.arregloDeLetras.splice(numerosDisponibles, 1);
+        this.arregloDeLetrasDisponibles[i];
+      }
+
+      console.log(this.arregloDeLetrasDisponibles);
+    }
+
+
+
     console.log(this.arregloDeLetras);
-    console.log(this.PalabrasEspañol);
+    console.log("arreglo de letras disponibles: " + this.arregloDeLetrasDisponibles);
   }
 
 añadirArregloDeLetras(a: Letra){
@@ -98,6 +116,10 @@ añadirArregloDeLetras(a: Letra){
       this.arregloDeLetras.push(a._letra);
     }
 }
+
+añadirArregloDeLetrasDisponibles(a: Letra) {
+}
+
 
 
 validarPalabra(){}
