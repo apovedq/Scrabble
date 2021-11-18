@@ -13,9 +13,14 @@ export default class Letra {
     this.cantidad = cantidad;
   }
 
-  public get _letra() {
+  public get _letra() : string {
     return this.letra
   }
+
+  public get _puntaje() : number {
+    return this.puntaje
+  }
+
 
 
 }
