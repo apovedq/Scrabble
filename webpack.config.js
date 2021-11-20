@@ -46,6 +46,7 @@ module.exports = {
         patterns: [
           {from: 'node_modules/pixi.js/dist/browser/pixi.min.js', to: PATHS.dist},
           {from: 'index.html', to: PATHS.dist},
+          {from: 'public', to: PATHS.dist},
         ],
       }),
   ],

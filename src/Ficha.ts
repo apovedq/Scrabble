@@ -2,7 +2,7 @@ import {Graphics, Ticker, Text} from 'pixi.js';
 import Letra from "./Letra";
 
 export default class Ficha extends Graphics {
-  private lado: number = 90;
+  private lado: number = 70;
   protected clickeado: boolean = false;
   protected ticker: Ticker;
   protected text: Text;
@@ -23,7 +23,6 @@ export default class Ficha extends Graphics {
     // interactividad
     this.interactive = true;
     this.buttonMode = true;
-    this.on('click', this.clickear);
     this.ticker = ticker;
     ticker.add(this.onTickerUpdate, this);
 
@@ -31,7 +30,7 @@ export default class Ficha extends Graphics {
     this.text = new Text(this.texto + '', {
       fontFamily: 'Arial',
       fontSize: 29,
-      fill: 0xffd900,
+      fill: 0x103203,
       align: 'left'
     });
 
@@ -39,7 +38,7 @@ export default class Ficha extends Graphics {
     this.points = new Text(this.puntaje + '', {
       fontFamily: 'Arial',
       fontSize: 15,
-      fill: 0xffd900,
+      fill: 0x103203,
       align: 'left'
     });
 
@@ -49,8 +48,8 @@ export default class Ficha extends Graphics {
     this.addChild(this.text);
 
     //Coordenadas donde se pinta el puntaje
-    this.points.x = this.x + 65;
-    this.points.y = this.y + 60;
+    this.points.x = this.x + 55;
+    this.points.y = this.y + 50;
     this.addChild(this.points);
   }
 
@@ -62,22 +61,28 @@ export default class Ficha extends Graphics {
   // dibuja el rectangulo en base
   public dibujar(): void {
     this.clear();
-    this.beginFill(0x800000);
-    this.lineStyle(5, 0xFF0000, 2);
-    this.drawRect(this.x, this.y, this.lado, this.lado);
+    this.beginFill(0xdedd92);
+    this.lineStyle(5, 0x103203, 2);
+    this.drawRoundedRect(this.x, this.y, this.lado, this.lado, 10);
+    //this.drawRect(this.x, this.y, this.lado, this.lado);
     this.endFill();
   }
 
 
-  public clickear() {
-    if (this.clickeado === false) {
-      this.clickeado = true;
-    } else {
-      this.clickeado = false;
-    }
+  public click() {
+    this.clickeado = !this.clickeado;
+    console.log('me han clickeado: ' + this.clickeado);
   }
 
-  public obtenerPuntaje(arregloInicial: Letra []) {
+  public setY (y: number) {
+    this.y = y;
+  }
+
+  public get _click() {
+    return this.clickeado;
+  }
+
+  private obtenerPuntaje(arregloInicial: Letra []) {
     for (let i = 0; i < arregloInicial.length; i++) {
       if (this.texto === arregloInicial[i]._letra) {
         return arregloInicial[i]._puntaje;
