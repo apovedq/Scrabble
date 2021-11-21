@@ -10,14 +10,21 @@ export default class Ficha extends Graphics {
   public texto: string;
   public puntaje: number | undefined;
   public arregloDeLetras: Letra [];
+  public mouseX: number;
+  public mouseY: number;
 
-  constructor(ticker: Ticker, x: number, y: number, texto: string, arregloDeLetras: Letra []) {
+  constructor(ticker: Ticker, x: number, y: number, texto: string, arregloDeLetras: Letra [], mouseX: number, mouseY: number) {
     super();
     this.x = x;
     this.y = y;
     this.texto = texto;
     this.arregloDeLetras = arregloDeLetras;
     this.puntaje = this.obtenerPuntaje(this.arregloDeLetras);
+    this.mouseX = mouseX;
+    this.mouseY = mouseY;
+
+
+
 
 
     // interactividad
@@ -56,6 +63,7 @@ export default class Ficha extends Graphics {
   protected onTickerUpdate(): void {
     this.dibujar();
     this.obtenerPuntaje(this.arregloDeLetras);
+    this.tomarPosiciones(this.mouseX, this.mouseY)
   }
 
   // dibuja el rectangulo en base
@@ -89,6 +97,15 @@ export default class Ficha extends Graphics {
       }
     }
   }
+
+  private tomarPosiciones(x: number, y: number) {
+    if(this.clickeado === true) {
+      this.x = x;
+      this.y = y;
+    }
+  }
+
+
 
 
 }

@@ -1,8 +1,10 @@
 import {Application, Loader, TilingSprite, LoaderResource} from 'pixi.js';
 import {FederatedPointerEvent} from "@pixi/events";
-import {Dict} from "@pixi/utils";
+import Texto from './Texto'
 import Letra from './Letra'
 import Ficha from './Ficha'
+import {Sprites} from "./imageLoader"
+import Boton from './Boton'
 
 export default class Canvas {
   private app: Application;
@@ -21,7 +23,7 @@ export default class Canvas {
   public letraF = new Letra("F", 4, 1);
   public letraG = new Letra("G", 2, 2);
   public letraH = new Letra("H", 4, 2);
-  public letraI = new Letra("I", 1, 6);
+  public letraI = new Letra("I", 1, 7);
   public letraJ = new Letra("J", 8, 1);
   public letraL = new Letra("L", 1, 4);
   public letraLL = new Letra("LL", 8, 1);
@@ -41,7 +43,8 @@ export default class Canvas {
   public letraY = new Letra("Y", 4, 1);
   public letraZ = new Letra("Z", 10, 1);
   public loader: Loader;
-  private background?: TilingSprite;
+  private puntosTotales: Texto;
+  public botonRellenar : Boton;
 
 
   public arregloDeLetras: string [] = [];
@@ -66,18 +69,53 @@ export default class Canvas {
     element.appendChild(this.app.view);
     this.loader = new Loader();
     this.app.stage.addChild(sprites.plantilla);
+    this.app.stage.on("pointermove", this.actualizarPosicionMouse.bind(this));
 
-    if(this.background){
-      this.app.stage.addChild(this.background);
-    }
-
-    //Posicion incial de X
-    let posXInicial = 205;
-    // Distancia entre Fichas
-    let distFichas = 50;
+    let visibilidad = false;
+    let botonRellenar = this.crearBotonRellenar(visibilidad)
+    this.app.stage.addChild(botonRellenar);
 
     element.appendChild(this.app.view);
 
+
+    this.añadirLetrasIniciales();
+
+    //Llenar los espacios vacios de el arreglo "Letras Disponibles"
+    //Con el arreglo de "Letras"
+      this.llenarEspacioDeLetrasDisponibles();
+
+
+
+
+    this.app.ticker.add(this.pruebaFichas, this);
+
+    //Cambiar de arreglo fichas a fichas Palabra
+    //Crear 7 fichas formadora de palabra
+    for (let i = 0; i < 7; i++) {
+      if (this.fichas[i]) {
+        if (this.fichas[i]._click === true) {
+          let posFicha = this.fichas.indexOf(this.fichas[i])
+          console.log('posicion de la ficha: ' + posFicha);
+          this.fichas[i].setY(300);
+          this.fichasPalabra.push(this.fichas[i]);
+          this.fichas.splice(posFicha, 1);
+        }
+      }
+    }
+
+
+    //Contador de fichas restantes
+    this.contadorDeFichasRestantes();
+  }
+
+  private añadirArregloDeLetras(a: Letra) {
+    for (let i = 0; i < a.cantidad; i++) {
+      this.arregloInicial.push(a);
+      this.arregloDeLetras.push(a._letra);
+    }
+  }
+
+  private añadirLetrasIniciales() {
     this.añadirArregloDeLetras(this.letraA);
     this.añadirArregloDeLetras(this.letraB);
     this.añadirArregloDeLetras(this.letraC);
@@ -106,58 +144,50 @@ export default class Canvas {
     this.añadirArregloDeLetras(this.letraX);
     this.añadirArregloDeLetras(this.letraY);
     this.añadirArregloDeLetras(this.letraZ);
+  }
 
-
-
-
-    //Llenar los espacios vacios de el arreglo "Letras Disponibles"
-    //Con el arreglo de "Letras"
-    for (let i = 0; i < this.arregloDeLetrasDisponibles.length ; i++) {
+  private llenarEspacioDeLetrasDisponibles(){
+    for (let i = 0; i < this.arregloDeLetrasDisponibles.length; i++) {
 
       let numerosDisponibles = (Math.random() * (this.arregloDeLetras.length - 0) + 0);
 
-
       if (this.arregloDeLetrasDisponibles[i] === undefined) {
-        if(this.arregloDeLetras[Math.ceil(numerosDisponibles)] != undefined) {
+        if (this.arregloDeLetras[Math.ceil(numerosDisponibles)] != undefined) {
           this.arregloDeLetrasDisponibles[i] = this.arregloDeLetras[Math.ceil(numerosDisponibles)];
           this.arregloDeLetras.splice(numerosDisponibles, 1);
         }
       }
 
     }
+  }
 
+  protected actualizarPosicionMouse(evento: any): void {
+    this.mouseX = evento.data.global.x;
+    this.mouseY = evento.data.global.y;
+  }
+
+  private contadorDeFichasRestantes() {
+    this.puntosTotales = new Texto(this.app.ticker, 245, 325, this.arregloDeLetras.length, 80, 0xfff000);
+    this.app.stage.addChild(this.puntosTotales);
+  }
+
+  private crearBotonRellenar(visibilidad: boolean) {
+    return new Boton(this.app.ticker, 220, 730, 50, 210, 0x000000, "rellenar", 30, visibilidad);
+  }
+
+  pruebaFichas() {
     //Crear 7 fichas que contienen letras
+
+    //Posicion incial de X y distancia entre fichas
+    let posXInicial = 205, distFichas = 50;
+
     for (let i = 0; i < this.arregloDeLetrasDisponibles.length; i++) {
 
-      this.fichas.push(new Ficha(this.app.ticker, posXInicial, 260, this.arregloDeLetrasDisponibles[i], this.arregloInicial))
+      console.log("x: "+this.mouseX + "y: "+this.mouseY);
+      this.fichas.push(new Ficha(this.app.ticker, posXInicial, 260, this.arregloDeLetrasDisponibles[i], this.arregloInicial, this.mouseX, this.mouseY))
       posXInicial += distFichas;
       this.app.stage.addChild(this.fichas[i]);
 
     }
-
-
-    //Cambiar de arreglo fichas a fichas Palabra
-    //Crear 7 fichas formadora de palabra
-    for (let i = 0; i < 7; i++) {
-      if(this.fichas[i]) {
-        if(this.fichas[i]._click === true) {
-          let posFicha = this.fichas.indexOf(this.fichas[i])
-          console.log('posicion de la ficha: ' + posFicha);
-          this.fichas[i].setY(300);
-          this.fichasPalabra.push(this.fichas[i]);
-          this.fichas.splice(posFicha,1);
-        }
-      }
-    }
-
   }
-
-  añadirArregloDeLetras(a: Letra) {
-    for (let i = 0; i < a.cantidad; i++) {
-      this.arregloInicial.push(a);
-      this.arregloDeLetras.push(a._letra);
-    }
-  }
-
-
 }
